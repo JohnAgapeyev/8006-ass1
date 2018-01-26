@@ -11,3 +11,6 @@ iptables -F
 #Drop tcp existing non-default chains
 iptables -X
 
+iptables -P INPUT ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P FORWARD ACCEPT

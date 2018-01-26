@@ -43,20 +43,30 @@ IFS=',' read -ra ACCEPT <<< "$ACCEPT_LIST"
 for i in "${ACCEPT[@]}"; do
     # process "$i"
     echo $i
-    iptables -A INPUT -m tcp -p tcp --sport $i -j ACCEPT
-    iptables -A INPUT -m tcp -p tcp --dport $i -j ACCEPT
-    iptables -A OUTPUT -m tcp -p tcp --sport $i -j ACCEPT
-    iptables -A OUTPUT -m tcp -p tcp --dport $i -j ACCEPT
+    iptables -A WEBSSH -m tcp -p tcp --sport $i -j ACCEPT
+    iptables -A WEBSSH -m tcp -p tcp --dport $i -j ACCEPT
+    iptables -A WEBSSH -m tcp -p tcp --sport $i -j ACCEPT
+    iptables -A WEBSSH -m tcp -p tcp --dport $i -j ACCEPT
+
+    iptables -A REST -m tcp -p tcp --sport $i -j ACCEPT
+    iptables -A REST -m tcp -p tcp --dport $i -j ACCEPT
+    iptables -A REST -m tcp -p tcp --sport $i -j ACCEPT
+    iptables -A REST -m tcp -p tcp --dport $i -j ACCEPT
 done
 
 IFS=',' read -ra DROP <<< "$DROP_LIST"
 for i in "${DROP[@]}"; do
     # process "$i"
     echo $i
-    iptables -A INPUT -m tcp -p tcp --sport $i -j DROP
-    iptables -A INPUT -m tcp -p tcp --dport $i -j DROP
-    iptables -A OUTPUT -m tcp -p tcp --sport $i -j DROP
-    iptables -A OUTPUT -m tcp -p tcp --dport $i -j DROP
+    iptables -A WEBSSH -m tcp -p tcp --sport $i -j DROP
+    iptables -A WEBSSH -m tcp -p tcp --dport $i -j DROP
+    iptables -A WEBSSH -m tcp -p tcp --sport $i -j DROP
+    iptables -A WEBSSH -m tcp -p tcp --dport $i -j DROP
+
+    iptables -A REST -m tcp -p tcp --sport $i -j DROP
+    iptables -A REST -m tcp -p tcp --dport $i -j DROP
+    iptables -A REST -m tcp -p tcp --sport $i -j DROP
+    iptables -A REST -m tcp -p tcp --dport $i -j DROP
 done
 
 

@@ -5,10 +5,8 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-ACCEPT_LIST='80,443,53,22'
+ACCEPT_LIST='80,443,53,22,546,547,647,847'
 DROP_LIST='0'
-
-
 
 #Drop all existing rules
 iptables -F

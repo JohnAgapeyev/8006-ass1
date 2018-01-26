@@ -14,33 +14,30 @@ iptables -F
 #Drop tcp existing non-default chains
 iptables -X
 
-iptables -N web_and_ssh
-iptables -N rest_traffic
+iptables -N WEBSSH
+iptables -N REST
 
 #Set drop policy as default
 iptables -P INPUT DROP
 iptables -P OUTPUT DROP
 iptables -P FORWARD DROP
 
-iptables -P web_and_ssh DROP
-iptables -P rest_traffic DROP
-
 #Accounting forwarding rules
-iptables -A INPUT -m tcp -p tcp --sport www -j web_and_ssh
-iptables -A INPUT -m tcp -p tcp --dport www -j web_and_ssh
-iptables -A INPUT -m tcp -p tcp --sport ssh -j web_and_ssh
-iptables -A INPUT -m tcp -p tcp --dport ssh -j web_and_ssh
-iptables -A OUTPUT -m tcp -p tcp --sport www -j web_and_ssh
-iptables -A OUTPUT -m tcp -p tcp --dport www -j web_and_ssh
-iptables -A OUTPUT -m tcp -p tcp --sport ssh -j web_and_ssh
-iptables -A OUTPUT -m tcp -p tcp --dport ssh -j web_and_ssh
+iptables -A INPUT -m tcp -p tcp --sport www -j WEBSSH
+iptables -A INPUT -m tcp -p tcp --dport www -j WEBSSH
+iptables -A INPUT -m tcp -p tcp --sport ssh -j WEBSSH
+iptables -A INPUT -m tcp -p tcp --dport ssh -j WEBSSH
+iptables -A OUTPUT -m tcp -p tcp --sport www -j WEBSSH
+iptables -A OUTPUT -m tcp -p tcp --dport www -j WEBSSH
+iptables -A OUTPUT -m tcp -p tcp --sport ssh -j WEBSSH
+iptables -A OUTPUT -m tcp -p tcp --dport ssh -j WEBSSH
 
-#Forward tcp other traffic to rest_traffic
-iptables -A INPUT -p tcp -j rest_traffic
+#Forward tcp other traffic to REST
+iptables -A INPUT -p tcp -j REST
 
-iptables -A rest_traffic -m tcp -p tcp --sport :1023 -j DROP
-iptables -A rest_traffic -m tcp -p tcp --sport 0 -j DROP
-iptables -A rest_traffic -m tcp -p tcp --dport 0 -j DROP
+iptables -A REST -m tcp -p tcp --sport :1023 -j DROP
+iptables -A REST -m tcp -p tcp --sport 0 -j DROP
+iptables -A REST -m tcp -p tcp --dport 0 -j DROP
 
 IFS=',' read -ra ACCEPT <<< "$ACCEPT_LIST"
 for i in "${ACCEPT[@]}"; do

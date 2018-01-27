@@ -5,8 +5,10 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-ACCEPT_LIST='80,443,53,22,546,547,647,847'
-DROP_LIST='0'
+TCP_ACCEPT='80, 443, 22, 546, 547, 647, 847'
+UDP_ACCEPT='53, 22, 546, 547, 647, 847'
+TCP_DROP='0'
+UDP_DROP='0'
 
 #Drop tcp existing rules
 iptables -F
@@ -32,41 +34,37 @@ iptables -A OUTPUT -m tcp -p tcp --dport www -j WEBSSH
 iptables -A OUTPUT -m tcp -p tcp --sport ssh -j WEBSSH
 iptables -A OUTPUT -m tcp -p tcp --dport ssh -j WEBSSH
 
-#Forward tcp other traffic to REST
-iptables -A INPUT -p tcp -j REST
+#Forward all other traffic to REST
+iptables -A INPUT -p all -j REST
+iptables -A OUTPUT -p all -j REST
 
-iptables -A REST -m tcp -p tcp --sport :1023 -j DROP
-iptables -A REST -m tcp -p tcp --sport 0 -j DROP
-iptables -A REST -m tcp -p tcp --dport 0 -j DROP
+iptables -A REST -m tcp -p tcp --sport :1023 --dport 80 -j DROP
 
-IFS=',' read -ra ACCEPT <<< "$ACCEPT_LIST"
+IFS=',' read -ra ACCEPT <<< "$TCP_ACCEPT"
 for i in "${ACCEPT[@]}"; do
-    # process "$i"
-    echo $i
     iptables -A WEBSSH -m tcp -p tcp --sport $i -j ACCEPT
     iptables -A WEBSSH -m tcp -p tcp --dport $i -j ACCEPT
-    iptables -A WEBSSH -m tcp -p tcp --sport $i -j ACCEPT
-    iptables -A WEBSSH -m tcp -p tcp --dport $i -j ACCEPT
-
-    iptables -A REST -m tcp -p tcp --sport $i -j ACCEPT
-    iptables -A REST -m tcp -p tcp --dport $i -j ACCEPT
     iptables -A REST -m tcp -p tcp --sport $i -j ACCEPT
     iptables -A REST -m tcp -p tcp --dport $i -j ACCEPT
 done
-
-IFS=',' read -ra DROP <<< "$DROP_LIST"
+IFS=',' read -ra DROP <<< "$TCP_DROP"
 for i in "${DROP[@]}"; do
-    # process "$i"
-    echo $i
     iptables -A WEBSSH -m tcp -p tcp --sport $i -j DROP
     iptables -A WEBSSH -m tcp -p tcp --dport $i -j DROP
-    iptables -A WEBSSH -m tcp -p tcp --sport $i -j DROP
-    iptables -A WEBSSH -m tcp -p tcp --dport $i -j DROP
-
-    iptables -A REST -m tcp -p tcp --sport $i -j DROP
-    iptables -A REST -m tcp -p tcp --dport $i -j DROP
     iptables -A REST -m tcp -p tcp --sport $i -j DROP
     iptables -A REST -m tcp -p tcp --dport $i -j DROP
 done
-
-
+IFS=',' read -ra ACCEPT <<< "$UDP_ACCEPT"
+for i in "${ACCEPT[@]}"; do
+    iptables -A WEBSSH -m udp -p udp --sport $i -j ACCEPT
+    iptables -A WEBSSH -m udp -p udp --dport $i -j ACCEPT
+    iptables -A REST -m udp -p udp --sport $i -j ACCEPT
+    iptables -A REST -m udp -p udp --dport $i -j ACCEPT
+done
+IFS=',' read -ra DROP <<< "$UDP_DROP"
+for i in "${DROP[@]}"; do
+    iptables -A WEBSSH -m udp -p udp --sport $i -j DROP
+    iptables -A WEBSSH -m udp -p udp --dport $i -j DROP
+    iptables -A REST -m udp -p udp --sport $i -j DROP
+    iptables -A REST -m udp -p udp --dport $i -j DROP
+done

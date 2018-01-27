@@ -38,7 +38,7 @@ iptables -A OUTPUT -m tcp -p tcp --dport ssh -j WEBSSH
 iptables -A INPUT -p all -j REST
 iptables -A OUTPUT -p all -j REST
 
-iptables -A REST -m tcp -p tcp --sport :1023 --dport 80 -j DROP
+iptables -A WEBSSH -m tcp -p tcp --sport :1023 --dport 80 -j DROP
 
 IFS=',' read -ra ACCEPT <<< "$TCP_ACCEPT"
 for i in "${ACCEPT[@]}"; do
